@@ -1,0 +1,30 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+venv/
+.venv/
+
+# Environment
+.env
+
+# Vector store (regenerated from data)
+vector_store/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Data (large files, re-downloadable)
+data/sample_labels/*.json
+
+# Keep directory structure
+!data/sample_labels/.gitkeep
+!data/eval/.gitkeep
