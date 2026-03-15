@@ -1,0 +1,70 @@
+# ============================================================
+# Clinical Document Intelligence Platform
+# Docker Compose - Local Development & Deployment
+# Module 16: Cloud-Native Deployment
+# ============================================================
+
+version: "3.9"
+
+services:
+  # === Main Application ===
+  app:
+    build:
+      context: .
+      target: development
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    volumes:
+      - ./data:/app/data
+      - ./vector_store:/app/vector_store
+      - ./src:/app/src          # Hot reload in dev
+      - ./config:/app/config
+    depends_on:
+      - redis
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+
+  # === Redis Cache (Module 8: Caching & Performance) ===
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --save 60 1 --loglevel warning
+    restart: unless-stopped
+
+  # === Production Deployment ===
+  app-prod:
+    build:
+      context: .
+      target: production
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    volumes:
+      - prod_data:/app/data
+      - prod_vectors:/app/vector_store
+    depends_on:
+      - redis
+    restart: always
+    deploy:
+      resources:
+        limits:
+          memory: 4G
+          cpus: "2"
+    profiles:
+      - production
+
+volumes:
+  redis_data:
+  prod_data:
+  prod_vectors:
