@@ -318,5 +318,5 @@ MIT
 
 **Erick K. Yegon, PhD**  
 Director-Level Data Science & Epidemiology  
-📧 keyegon@gmail.com  
+📧 keyegonaws@gmail.com  
 🔗 [LinkedIn](https://linkedin.com/in/erickyegon) | [GitHub](https://github.com/erickyegon) | [ORCID](https://orcid.org/0000-0002-7055-4848)
