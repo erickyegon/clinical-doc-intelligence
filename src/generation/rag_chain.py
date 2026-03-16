@@ -87,7 +87,7 @@ class PromptManager:
 
     def _load_templates(self):
         try:
-            with open(self.config_path, "r") as f:
+            with open(self.config_path, "r", encoding="utf-8") as f:
                 self.templates = yaml.safe_load(f)
             logger.info(f"Loaded prompt templates from {self.config_path}")
         except Exception as e:
