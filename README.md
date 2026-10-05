@@ -6,7 +6,7 @@
 
 **AI-powered FDA drug label intelligence system for regulatory analysis, formulary decision support, and competitive intelligence.**
 
-> Built by [Erick K. Yegon, PhD](https://linkedin.com/in/erickyegon) — Director-level Data Scientist & Epidemiologist with 17+ years in global health analytics.
+Author: Erick Kiprotich Yegon, epidemiologist and data scientist (real-world evidence, HEOR, causal inference) · Portfolio: https://erickyegon.github.io · LinkedIn: https://linkedin.com/in/erickyegon
 
 ---
 
@@ -311,12 +311,3 @@ This project implements concepts from across the Full Stack Generative AI BootCa
 ## License
 
 MIT
-
----
-
-## Contact
-
-**Erick K. Yegon, PhD**  
-Director-Level Data Science & Epidemiology  
-📧 keyegonaws@gmail.com  
-🔗 [LinkedIn](https://linkedin.com/in/erickyegon) | [GitHub](https://github.com/erickyegon) | [ORCID](https://orcid.org/0000-0002-7055-4848)
