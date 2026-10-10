@@ -57,7 +57,7 @@ class VectorStoreManager:
         """
         Add documents to the vector store.
         ChromaDB handles embedding generation internally.
-        
+
         Returns number of documents added.
         """
         if not texts:
@@ -87,13 +87,13 @@ class VectorStoreManager:
     ) -> dict:
         """
         Query the vector store with optional metadata filtering.
-        
+
         Args:
             query_text: The search query
             n_results: Number of results to return
             where: Metadata filter (e.g., {"drug_name": "Jardiance"})
             where_document: Document content filter
-            
+
         Returns:
             Dict with keys: ids, documents, metadatas, distances
         """

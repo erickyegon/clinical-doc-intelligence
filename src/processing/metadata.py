@@ -4,7 +4,6 @@ Extracts and normalizes metadata for filtering and scoped retrieval.
 
 Module 7: Metadata Design & Filtering
 """
-import re
 import logging
 
 logger = logging.getLogger(__name__)
@@ -42,7 +41,7 @@ class MetadataExtractor:
     def enrich(self, metadata: dict, label) -> dict:
         """
         Enrich chunk metadata with derived fields.
-        
+
         Adds:
         - normalized_therapeutic_area: Standardized therapeutic area
         - has_boxed_warning: Boolean
@@ -65,7 +64,7 @@ class MetadataExtractor:
         section_content = ""
         if section_type in label.sections:
             section_content = label.sections[section_type].get("content", "")
-        
+
         safety_flags = []
         for flag_name, keywords in SAFETY_KEYWORDS.items():
             if any(kw.lower() in section_content.lower() for kw in keywords):

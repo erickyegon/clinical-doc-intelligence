@@ -4,18 +4,18 @@ Production-grade REST API for FDA drug label intelligence.
 
 Module 16: End-to-End Project with Deployment
 """
-import time
 import logging
 from contextlib import asynccontextmanager
 from typing import Optional
 
-from fastapi import FastAPI, HTTPException, Depends, Query
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 
 from config.settings import API_HOST, API_PORT, LOG_LEVEL
 from src.retrieval.vector_store import VectorStoreManager
 from src.retrieval.hybrid_search import HybridRetriever, CrossEncoderReranker
+from src.agents.api_routes import router as agent_router
 from src.generation.rag_chain import RAGChain, PromptManager
 from src.orchestration.model_router import ModelRouter, TokenTracker
 from src.guardrails.validators import (
@@ -121,7 +121,6 @@ app.add_middleware(
 )
 
 # Register agent routes (Module 9)
-from src.agents.api_routes import router as agent_router
 app.include_router(agent_router)
 
 
@@ -173,7 +172,7 @@ async def health_check():
 async def query_documents(request: QueryRequest):
     """
     Query FDA drug labels with citation-grounded answers.
-    
+
     Supports:
     - General clinical questions
     - Drug-specific queries (filter by drug_name)
@@ -236,7 +235,7 @@ async def query_documents(request: QueryRequest):
 async def compare_drugs(request: ComparisonRequest):
     """
     Compare FDA drug labels across multiple products.
-    
+
     Use cases:
     - Compare black box warnings across a drug class
     - Compare contraindication profiles

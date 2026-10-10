@@ -41,11 +41,11 @@ JSONRPC_VERSION = "2.0"
 class MCPServer:
     """
     Lightweight MCP server implementing the core protocol.
-    
+
     Capabilities exposed:
     - tools/list: Enumerate available clinical intelligence tools
     - tools/call: Execute a tool and return results
-    
+
     This implementation uses STDIO transport for local integration.
     For production SSE/HTTP transport, wrap with FastAPI.
     """

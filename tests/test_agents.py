@@ -6,19 +6,19 @@ import os
 import sys
 import json
 import pytest
-from unittest.mock import MagicMock, AsyncMock, patch
+from unittest.mock import MagicMock, AsyncMock
 from dataclasses import dataclass
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from src.agents.base import (
-    BaseAgent, AgentState, AgentStep, AgentMemory,
-    Tool, ToolResult,
+    AgentStep, AgentMemory,
+    ToolResult,
 )
 from src.agents.tools import (
-    RAGSearchTool, SafetyCheckTool, DrugComparisonTool, SynthesizeTool,
+    RAGSearchTool, SafetyCheckTool, SynthesizeTool,
 )
-from src.agents.clinical_agents import DrugAnalysisAgent, SafetyReviewAgent, ComparisonAgent
+from src.agents.clinical_agents import DrugAnalysisAgent
 from src.agents.coordinator import MultiAgentCoordinator, TaskClassifier
 from src.agents.mcp_server import MCPServer
 

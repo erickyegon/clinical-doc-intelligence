@@ -9,13 +9,11 @@ Module 9: Multi-Agent System Designs
 - Human-in-the-Loop Mechanisms
 - Cost & Execution Management
 """
-import json
 import logging
 import time
 from dataclasses import dataclass, field
 from typing import Optional, Callable
 
-from src.agents.base import AgentState, AgentMemory
 from src.agents.clinical_agents import DrugAnalysisAgent, SafetyReviewAgent, ComparisonAgent
 from src.agents.tools import (
     RAGSearchTool, FDALabelLookupTool, ClinicalTrialSearchTool,
@@ -104,7 +102,7 @@ class TaskClassifier:
 class MultiAgentCoordinator:
     """
     Supervisor-pattern coordinator for clinical intelligence agents.
-    
+
     Architecture:
     ┌──────────────────────────────────┐
     │         Coordinator              │
@@ -115,7 +113,7 @@ class MultiAgentCoordinator:
     │ Analysis │  Review   │  Agent    │
     │  Agent   │  Agent    │           │
     └──────────┴───────────┴───────────┘
-    
+
     Features:
     - Automatic task classification and agent routing
     - Shared tool pool across agents
@@ -192,7 +190,7 @@ class MultiAgentCoordinator:
     async def process(self, task: str) -> CoordinatorResult:
         """
         Main entry point: classify → route → execute → aggregate.
-        
+
         Includes human-in-the-loop gates for safety-critical results.
         """
         start_time = time.time()
@@ -294,7 +292,6 @@ class MultiAgentCoordinator:
     def _estimate_confidence(self, agent_result: dict) -> float:
         """Estimate confidence based on agent execution quality."""
         state = agent_result.get("state", "")
-        steps = agent_result.get("steps_taken", 0)
         findings = len(agent_result.get("findings", []))
 
         if state == "completed" and findings >= 2:

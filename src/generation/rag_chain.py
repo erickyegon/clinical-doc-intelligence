@@ -6,14 +6,12 @@ Module 6: Prompt Engineering
 Module 7: Prompting with Retrieved Context
 Module 8: Context Engineering & Memory Management
 """
-import json
 import logging
 import time
 import yaml
 from pathlib import Path
 from typing import Optional
 from dataclasses import dataclass, field
-from string import Template
 
 from jinja2 import Environment, BaseLoader
 
@@ -112,7 +110,7 @@ class PromptManager:
 class RAGChain:
     """
     End-to-end RAG pipeline: query rewrite → retrieve → generate → cite.
-    
+
     Module 7: End-to-End RAG System Architecture
     Module 8: Context Engineering
     """
@@ -132,7 +130,7 @@ class RAGChain:
     ) -> RAGResponse:
         """
         Execute the full RAG pipeline.
-        
+
         1. Rewrite query for better retrieval
         2. Retrieve relevant documents
         3. Assemble context with citation markers
@@ -168,7 +166,7 @@ class RAGChain:
 
         # Step 4: Assemble context and generate
         context_docs = self._prepare_context_documents(retrieval_result.top_documents)
-        
+
         system_prompt = self.prompt_manager.get_system_prompt("clinical_qa")
         user_prompt = self.prompt_manager.render_user_prompt(
             "clinical_qa",
@@ -313,7 +311,6 @@ class RAGChain:
         avg_score = sum(top_scores) / len(top_scores) if top_scores else 0
 
         # Factor in document diversity
-        unique_drugs = len(set(d.drug_name for d in result.documents))
         unique_sections = len(set(d.section_type for d in result.documents))
 
         # Higher confidence if multiple relevant sections found

@@ -339,7 +339,7 @@ def ingest_orange_book(vector_store):
         print("  No Products.txt found. Run: python scripts/seed_data.py")
         return 0
 
-    print(f"\n--- Source 4: FDA Orange Book ---")
+    print("\n--- Source 4: FDA Orange Book ---")
     total_chunks = 0
 
     try:

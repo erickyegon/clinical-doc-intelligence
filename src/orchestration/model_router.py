@@ -7,13 +7,12 @@ Module 3: Provider Switching & Abstraction Layer
 Module 8: Caching & Performance Optimization
 """
 import json
-import time
 import logging
 from typing import Optional
 
 import httpx
 
-from config.settings import LLM_PROVIDER, LLM_CONFIGS, ENABLE_CACHE
+from config.settings import LLM_PROVIDER, LLM_CONFIGS
 
 logger = logging.getLogger(__name__)
 
@@ -65,7 +64,7 @@ class TokenTracker:
 class ModelRouter:
     """
     Routes LLM requests across providers with automatic fallback.
-    
+
     Provider priority: primary → fallback → error
     All providers use OpenAI-compatible API format (except Bedrock).
     """
@@ -109,7 +108,7 @@ class ModelRouter:
         """
         Generate a response using the specified or default provider.
         Automatically falls back to next provider on failure.
-        
+
         Returns:
             dict with keys: content, model, total_tokens, input_tokens, output_tokens, provider
         """

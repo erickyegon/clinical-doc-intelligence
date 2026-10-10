@@ -53,13 +53,13 @@ class AgentStatsResponse(BaseModel):
 async def agent_analyze(request: AgentQueryRequest):
     """
     Run a multi-agent clinical intelligence analysis.
-    
+
     The coordinator automatically:
     1. Classifies your task (drug analysis, safety review, or comparison)
     2. Routes to the appropriate specialized agent
     3. The agent plans its approach, calls tools, and synthesizes results
     4. Safety-critical results trigger human-in-the-loop flags
-    
+
     Example tasks:
     - "Tell me about Ozempic for type 2 diabetes management"
     - "Is Jardiance safe for patients with renal impairment?"

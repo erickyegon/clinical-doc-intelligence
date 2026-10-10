@@ -6,14 +6,12 @@ Run: pytest tests/ -v
 """
 import os
 import sys
-import json
 import pytest
-from pathlib import Path
-from unittest.mock import MagicMock, patch, AsyncMock
+from unittest.mock import MagicMock
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from src.ingestion.fda_labels import FDALabelClient, DrugLabel
+from src.ingestion.fda_labels import FDALabelClient
 from src.processing.chunker import SectionAwareChunker
 from src.processing.metadata import MetadataExtractor
 from src.guardrails.validators import InputGuardrails, OutputGuardrails, QueryRequest
@@ -230,10 +228,10 @@ class TestMetadataExtraction:
         # Boxed warning should have highest priority
         bw_meta = {"section_type": "boxed_warning", "therapeutic_area": ""}
         enriched_bw = metadata_extractor.enrich(bw_meta, sample_label)
-        
+
         desc_meta = {"section_type": "description", "therapeutic_area": ""}
         enriched_desc = metadata_extractor.enrich(desc_meta, sample_label)
-        
+
         assert enriched_bw["section_priority"] > enriched_desc["section_priority"]
 
 
@@ -292,7 +290,7 @@ class TestOutputGuardrails:
         response.confidence = 0.1
         response.answer = "Some answer"
         response.citations = [MagicMock()]
-        
+
         result = output_guardrails.validate(response)
         assert any("confidence" in issue.lower() for issue in result.issues)
 
@@ -301,7 +299,7 @@ class TestOutputGuardrails:
         response.confidence = 0.8
         response.answer = "A" * 150  # Long enough to expect citations
         response.citations = []
-        
+
         result = output_guardrails.validate(response)
         assert any("citation" in issue.lower() for issue in result.issues)
 
@@ -310,14 +308,14 @@ class TestOutputGuardrails:
         response.confidence = 0.9
         response.answer = "This drug is guaranteed to cure diabetes with no side effects"
         response.citations = [MagicMock()]
-        
+
         result = output_guardrails.validate(response)
         assert result.risk_level.value == "high"
 
     def test_disclaimer_added(self, output_guardrails):
         response = MagicMock()
         response.answer = "Metformin is used for diabetes."
-        
+
         with_disclaimer = output_guardrails.add_disclaimer(response)
         assert "DISCLAIMER" in with_disclaimer
         assert "medical advice" in with_disclaimer.lower()
@@ -334,7 +332,7 @@ class TestVectorStore:
             metadatas=[{"drug_name": "JARDIANCE", "section_type": "indications_and_usage"}],
             ids=["test_001"],
         )
-        
+
         results = temp_vector_store.query("diabetes medication", n_results=1)
         assert len(results["documents"]) == 1
         assert "Empagliflozin" in results["documents"][0]
@@ -351,7 +349,7 @@ class TestVectorStore:
             ],
             ids=["j_001", "m_001"],
         )
-        
+
         results = temp_vector_store.query_with_metadata_filter(
             query_text="contraindications",
             drug_name="JARDIANCE",
@@ -362,7 +360,7 @@ class TestVectorStore:
 
     def test_document_count(self, temp_vector_store):
         assert temp_vector_store.get_document_count() == 0
-        
+
         temp_vector_store.add_documents(
             texts=["Test doc 1", "Test doc 2"],
             metadatas=[{"drug_name": "A"}, {"drug_name": "B"}],
@@ -415,10 +413,10 @@ class TestHybridRetrieval:
             ],
             ids=["c1", "d1", "a1"],
         )
-        
+
         retriever = HybridRetriever(vector_store=temp_vector_store, initial_k=3, final_k=2)
         result = retriever.retrieve("What are the contraindications for Jardiance?")
-        
+
         assert len(result.documents) > 0
         assert result.query == "What are the contraindications for Jardiance?"
 
@@ -446,23 +444,23 @@ class TestIngestionIntegration:
         """Test the full flow: parse → chunk → enrich → index."""
         client = FDALabelClient()
         label = client.parse_label(sample_raw_label)
-        
+
         chunker = SectionAwareChunker(chunk_size=500, chunk_overlap=100)
         chunks = chunker.chunk_label(label)
         assert len(chunks) > 0
-        
+
         extractor = MetadataExtractor()
         for chunk in chunks:
             chunk["metadata"] = extractor.enrich(chunk["metadata"], label)
-        
+
         temp_vector_store.add_documents(
             texts=[c["content"] for c in chunks],
             metadatas=[c["metadata"] for c in chunks],
             ids=[c["id"] for c in chunks],
         )
-        
+
         assert temp_vector_store.get_document_count() == len(chunks)
-        
+
         # Verify we can query it
         results = temp_vector_store.query("renal impairment contraindication", n_results=3)
         assert len(results["documents"]) > 0

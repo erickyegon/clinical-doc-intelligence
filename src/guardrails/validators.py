@@ -91,7 +91,7 @@ class RAGResponseSchema(BaseModel):
 class InputGuardrails:
     """
     Pre-processing guardrails for incoming queries.
-    
+
     Checks:
     1. PHI detection (SSN, DOB patterns)
     2. Prompt injection defense
@@ -163,7 +163,7 @@ class InputGuardrails:
         # Check 4: Blocked patterns from config
         for pattern in BLOCKED_PATTERNS:
             if re.search(pattern, query):
-                issues.append(f"Blocked content pattern detected")
+                issues.append("Blocked content pattern detected")
                 risk = RiskLevel.MEDIUM
 
         # Check 5: Sanitize
@@ -190,7 +190,7 @@ class InputGuardrails:
 class OutputGuardrails:
     """
     Post-processing guardrails for LLM outputs.
-    
+
     Checks:
     1. Confidence threshold
     2. Citation presence

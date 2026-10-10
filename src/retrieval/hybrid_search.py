@@ -86,7 +86,7 @@ class HybridRetriever:
     ) -> RetrievalResult:
         """
         Execute the full retrieval pipeline.
-        
+
         Args:
             query: Original user query
             drug_name: Filter to specific drug
@@ -223,10 +223,10 @@ class HybridRetriever:
 class CrossEncoderReranker:
     """
     Cross-encoder re-ranking for precision refinement.
-    
+
     In production, uses a fine-tuned cross-encoder model.
     Falls back to score-based ranking if model unavailable.
-    
+
     Module 7: Re-Ranking
     """
 

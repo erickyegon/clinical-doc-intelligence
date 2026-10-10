@@ -8,10 +8,7 @@ Module 10: Evaluation Strategies
 - Domain-specific: clinical accuracy, safety completeness
 - Cost/latency tracking alongside accuracy
 """
-import json
 import logging
-import time
-from typing import Optional
 from dataclasses import dataclass, field
 
 logger = logging.getLogger(__name__)
@@ -36,16 +33,16 @@ class EvalMetrics:
     retrieval_precision: float = 0.0  # Relevant docs / retrieved docs
     retrieval_recall: float = 0.0  # Retrieved relevant / total relevant
     context_relevance: float = 0.0  # How relevant is the context to the query
-    
+
     # Generation metrics
     faithfulness: float = 0.0  # Is the answer grounded in context?
     answer_relevance: float = 0.0  # Does the answer address the question?
     citation_accuracy: float = 0.0  # Are citations correct?
-    
+
     # Domain-specific
     safety_completeness: float = 0.0  # Did it include required safety info?
     clinical_accuracy: float = 0.0  # Verified against ground truth
-    
+
     # System metrics
     avg_latency_ms: float = 0.0
     avg_tokens: float = 0.0
@@ -82,7 +79,7 @@ class EvalMetrics:
 class RAGEvaluator:
     """
     Evaluates the complete RAG system using multiple metrics.
-    
+
     Evaluation modes:
     1. Automated (keyword/overlap-based) - no LLM needed
     2. LLM-as-a-judge - uses a strong LLM to assess quality
@@ -96,7 +93,7 @@ class RAGEvaluator:
     async def evaluate_dataset(self, eval_cases: list[EvalCase]) -> EvalMetrics:
         """Run evaluation across all test cases and aggregate metrics."""
         metrics = EvalMetrics()
-        
+
         results = []
         errors = 0
         total_latency = 0
@@ -105,11 +102,11 @@ class RAGEvaluator:
         for case in eval_cases:
             try:
                 response = await self.rag_chain.query(case.question)
-                
+
                 # Per-case metrics
                 case_metrics = self._evaluate_single(case, response)
                 results.append(case_metrics)
-                
+
                 total_latency += response.latency_ms
                 total_tokens += response.total_tokens
 
@@ -129,7 +126,7 @@ class RAGEvaluator:
         metrics.citation_accuracy = sum(r["citation_accuracy"] for r in results) / n
         metrics.safety_completeness = sum(r["safety_completeness"] for r in results) / n
         metrics.clinical_accuracy = sum(r["clinical_accuracy"] for r in results) / n
-        
+
         metrics.avg_latency_ms = total_latency / n
         metrics.avg_tokens = total_tokens / n
         metrics.total_queries = len(eval_cases)

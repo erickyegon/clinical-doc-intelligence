@@ -8,7 +8,6 @@ Module 7: Chunking Strategies — "When to chunk, when NOT to chunk"
 import re
 import hashlib
 import logging
-from typing import Optional
 
 from config.settings import CHUNK_SIZE, CHUNK_OVERLAP
 
@@ -18,7 +17,7 @@ logger = logging.getLogger(__name__)
 class SectionAwareChunker:
     """
     Intelligent chunker that respects FDA label section boundaries.
-    
+
     Strategy:
     - Short sections (< chunk_size): Keep as single chunk (preserve context)
     - Long sections: Split with overlap, preserving sentence boundaries
@@ -42,7 +41,7 @@ class SectionAwareChunker:
     def chunk_label(self, label) -> list[dict]:
         """
         Chunk an entire DrugLabel into indexed documents.
-        
+
         Returns list of dicts with keys: id, content, metadata
         """
         chunks = []
@@ -113,7 +112,7 @@ class SectionAwareChunker:
         """
         # Split into sentences
         sentences = re.split(r'(?<=[.!?])\s+', text)
-        
+
         chunks = []
         current_chunk = []
         current_length = 0

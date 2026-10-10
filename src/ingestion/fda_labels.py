@@ -92,14 +92,14 @@ class FDALabelClient:
     ) -> list[dict]:
         """
         Search FDA drug labels using openFDA API.
-        
+
         Args:
             drug_name: Brand or generic drug name
             therapeutic_area: Pharmacologic class
             manufacturer: Manufacturer name
             limit: Results per page (max 100)
             skip: Offset for pagination
-            
+
         Returns:
             List of raw label records from openFDA
         """
@@ -172,7 +172,7 @@ class FDALabelClient:
     def parse_label(self, raw_label: dict) -> DrugLabel:
         """
         Parse a raw openFDA label record into a structured DrugLabel.
-        
+
         The openFDA API returns labels with sections as top-level arrays.
         Each section value is a list of strings (usually one element).
         """

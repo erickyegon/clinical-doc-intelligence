@@ -6,10 +6,7 @@ the knowledge base, FDA APIs, and LLMs.
 Module 9: Tools as Agent Interfaces
 - APIs, functions, search, RAG, code execution as tools
 """
-import json
 import logging
-import time
-from typing import Optional
 
 from src.agents.base import Tool, ToolResult
 

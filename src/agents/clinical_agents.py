@@ -10,7 +10,7 @@ import json
 import logging
 from typing import Optional
 
-from src.agents.base import BaseAgent, AgentStep, AgentState, Tool, ToolResult
+from src.agents.base import BaseAgent, AgentStep
 
 logger = logging.getLogger(__name__)
 
@@ -18,9 +18,9 @@ logger = logging.getLogger(__name__)
 class DrugAnalysisAgent(BaseAgent):
     """
     Single agent for comprehensive drug analysis.
-    
+
     Handles: "Tell me everything about [drug]" queries.
-    
+
     Plan:
     1. Safety check (always first — safety-critical info surfaces first)
     2. RAG search for indications and dosing
@@ -28,7 +28,7 @@ class DrugAnalysisAgent(BaseAgent):
     4. Synthesize findings
     """
 
-    PLANNER_PROMPT = """You are a drug analysis planning agent. Given a user task about 
+    PLANNER_PROMPT = """You are a drug analysis planning agent. Given a user task about
 a drug, create an execution plan.
 
 Available tools:
@@ -248,7 +248,7 @@ Respond with JSON: {{"complete": true/false, "reasoning": "...", "missing": ["..
 class SafetyReviewAgent(BaseAgent):
     """
     Specialized agent focused exclusively on drug safety analysis.
-    
+
     Handles: "Is [drug] safe for [population]?" type queries.
     Always checks: boxed warnings, contraindications, drug interactions, pregnancy.
     """
@@ -342,7 +342,7 @@ class SafetyReviewAgent(BaseAgent):
 class ComparisonAgent(BaseAgent):
     """
     Agent specialized in cross-drug comparison analysis.
-    
+
     Handles: "Compare [drug A] vs [drug B] for [aspect]" queries.
     """
 

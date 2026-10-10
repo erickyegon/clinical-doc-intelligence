@@ -5,12 +5,11 @@ Orchestrates the full ingestion flow: fetch → parse → chunk → embed → in
 Module 7: End-to-End RAG System Architecture
 """
 import logging
-import json
 from typing import Optional
 from pathlib import Path
 from dataclasses import dataclass
 
-from src.ingestion.fda_labels import FDALabelClient, LocalLabelLoader, DrugLabel
+from src.ingestion.fda_labels import FDALabelClient, LocalLabelLoader
 from src.ingestion.clinical_trials import ClinicalTrialsClient
 from src.processing.chunker import SectionAwareChunker
 from src.processing.metadata import MetadataExtractor
@@ -47,7 +46,7 @@ class IngestionStats:
 class IngestionPipeline:
     """
     Full ingestion pipeline from FDA data sources to vector store.
-    
+
     Supports two modes:
     1. Live API mode: Fetches from openFDA API in real-time
     2. Local mode: Loads pre-downloaded JSON files
@@ -75,7 +74,7 @@ class IngestionPipeline:
     ) -> IngestionStats:
         """
         Ingest drug labels from the openFDA API for specified drug classes.
-        
+
         Args:
             drug_classes: List of pharmacologic class names
                 e.g. ["SGLT2 Inhibitor", "GLP-1 Receptor Agonist", "DPP-4 Inhibitor"]

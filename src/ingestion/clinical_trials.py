@@ -54,11 +54,11 @@ class ClinicalTrialsClient:
     ) -> dict:
         """
         Search clinical trials using the V2 API.
-        
+
         Returns dict with 'studies' list and 'nextPageToken' for pagination.
         """
         params = {"pageSize": min(page_size, 100), "format": "json"}
-        
+
         query_parts = []
         if query:
             query_parts.append(query)

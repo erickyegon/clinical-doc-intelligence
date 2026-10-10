@@ -14,7 +14,7 @@ import uuid
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Any, Callable, Optional
+from typing import Any, Optional
 
 logger = logging.getLogger(__name__)
 
@@ -148,16 +148,16 @@ class Tool(ABC):
 class BaseAgent(ABC):
     """
     Base agent with planning → reasoning → acting loop.
-    
+
     Module 9: Single-Agent Architectures
-    
+
     Lifecycle:
     1. Receive task
     2. Plan approach (which tools to use, in what order)
     3. Execute steps (call tools, process results)
     4. Reflect on results (is the answer sufficient?)
     5. Return final result or iterate
-    
+
     Safety controls (Module 9):
     - Max steps limit
     - Token budget
