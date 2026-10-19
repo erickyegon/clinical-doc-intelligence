@@ -8,17 +8,19 @@
 
 Author: Erick Kiprotich Yegon, epidemiologist and data scientist (real-world evidence, HEOR, causal inference) · Portfolio: https://erickyegon.github.io · LinkedIn: https://linkedin.com/in/erickyegon
 
+> **Status: research prototype, not a validated clinical tool.** There is no evaluation benchmark yet and no measured accuracy, faithfulness or citation results. The metrics in `src/evaluation/evaluator.py` are heuristic screens (word overlap, field-present and keyword checks), not clinical validation, and the "confidence" value is derived from retrieval scores. Answers depend on the label versions you download. Do not use this for patient care or regulatory decisions.
+
 ---
 
 ## The Problem
 
-Pharmaceutical HEOR teams, formulary committees, and regulatory analysts spend **40+ hours per drug** manually reviewing FDA labels, comparing safety profiles across drug classes, and tracking label changes. This work is repetitive, error-prone, and doesn't scale.
+Pharmaceutical HEOR teams, formulary committees, and regulatory analysts spend substantial time manually reviewing FDA labels, comparing safety profiles across drug classes, and tracking label changes. This work is repetitive, error-prone, and doesn't scale.
 
 ## The Solution
 
-A production-grade RAG (Retrieval-Augmented Generation) system that:
+A RAG (Retrieval-Augmented Generation) prototype that:
 
-- **Ingests** 70,000+ FDA drug labels from the openFDA API and clinical trial data from ClinicalTrials.gov
+- **Ingests** FDA drug labels from the openFDA API (you choose the drugs to download with `scripts/seed_data.py`) and clinical trial data from ClinicalTrials.gov
 - **Indexes** content with section-aware chunking that never splits safety-critical sections (Black Box Warnings, Contraindications)
 - **Retrieves** relevant information using hybrid search: dense vector retrieval → metadata filtering → section priority boosting → MMR diversification → cross-encoder re-ranking
 - **Generates** citation-grounded answers with source traceability back to specific label sections
@@ -37,18 +39,18 @@ A production-grade RAG (Retrieval-Augmented Generation) system that:
 │  INPUT     │        RAG PIPELINE                │    OUTPUT         │
 │ GUARDRAILS │                                    │   GUARDRAILS      │
 │            │  ┌──────────────────────────────┐  │                   │
-│ • PHI      │  │  Query Rewrite (Module 6)    │  │ • Confidence      │
+│ • PHI      │  │  Query Rewrite               │  │ • Confidence      │
 │   Detection│  │  ↓                           │  │   threshold       │
-│ • Injection│  │  Hybrid Retrieval (Module 7) │  │ • Citation        │
+│ • Injection│  │  Hybrid Retrieval            │  │ • Citation        │
 │   Defense  │  │  • Dense vector search       │  │   validation      │
 │ • Schema   │  │  • Metadata filtering        │  │ • Unsupported     │
 │   Validate │  │  • Section priority boost    │  │   claim detection │
 │            │  │  • MMR diversification       │  │ • Clinical        │
 │            │  │  • Cross-encoder re-rank     │  │   disclaimer      │
 │            │  │  ↓                           │  │                   │
-│            │  │  Context Assembly (Module 8)  │  │                   │
+│            │  │  Context Assembly             │  │                   │
 │            │  │  ↓                           │  │                   │
-│            │  │  LLM Generation (Module 3)   │  │                   │
+│            │  │  LLM Generation              │  │                   │
 │            │  │  • Provider switching         │  │                   │
 │            │  │  • Cost tracking             │  │                   │
 │            │  │  • Automatic fallback        │  │                   │
@@ -60,11 +62,11 @@ A production-grade RAG (Retrieval-Augmented Generation) system that:
 │  ┌──────────────┐  ┌──────────────┐  ┌────────────────────────────┐ │
 │  │ openFDA API  │  │ ClinicalTrial│  │ ChromaDB Vector Store      │ │
 │  │ 70K+ labels  │  │ .gov API V2  │  │ Section-aware chunks       │ │
-│  │              │  │ 400K+ trials │  │ Metadata: drug, section,   │ │
+│  │              │  │ trials       │  │ Metadata: drug, section,   │ │
 │  │              │  │              │  │ therapeutic area, safety    │ │
 │  └──────────────┘  └──────────────┘  └────────────────────────────┘ │
 ├─────────────────────────────────────────────────────────────────────┤
-│                    EVALUATION (Module 10)                             │
+│                    EVALUATION                                         │
 │  Faithfulness | Relevance | Citation Accuracy | Safety Completeness  │
 │  Latency | Token Cost | Error Rate                                   │
 └─────────────────────────────────────────────────────────────────────┘
@@ -101,9 +103,9 @@ Black Box Warnings and Contraindications are **never split** during chunking and
 ### 4. Multi-Provider LLM Routing
 Automatic provider switching across OpenAI, Groq, and AWS Bedrock with per-query cost tracking and fallback logic.
 
-### 5. Production Guardrails
+### 5. Guardrails
 - **Input**: PHI detection (SSN, MRN, DOB patterns), prompt injection defense, query sanitization
-- **Output**: Confidence thresholds, citation validation, unsupported clinical claim detection, mandatory disclaimers
+- **Output**: Retrieval-score thresholds (not a calibrated answer confidence), citation validation, unsupported clinical claim detection, mandatory disclaimers
 
 ---
 
@@ -111,15 +113,15 @@ Automatic provider switching across OpenAI, Groq, and AWS Bedrock with per-query
 
 | Layer | Technology | Purpose |
 |-------|-----------|---------|
-| API | FastAPI | Production REST API with OpenAPI docs |
+| API | FastAPI | REST API with OpenAPI docs |
 | Frontend | Streamlit | Interactive clinical intelligence dashboard |
 | LLM | OpenAI GPT-4o / Groq Llama 3.1 / AWS Bedrock | Multi-provider with fallback |
 | Vector DB | ChromaDB | Section-aware document storage |
 | Embeddings | all-MiniLM-L6-v2 (local) / text-embedding-3-small | Cost-tiered embedding |
 | Re-ranking | cross-encoder/ms-marco-MiniLM (optional) | Precision refinement |
-| Prompts | Jinja2 + YAML | Production-grade prompt management |
+| Prompts | Jinja2 + YAML | Prompt management |
 | Guardrails | Pydantic + custom validators | Input/output safety |
-| Evaluation | Custom RAGAS-inspired metrics | Domain-specific clinical eval |
+| Evaluation | Custom heuristic screening metrics (no benchmark yet) | Keyword and word-overlap checks |
 | Data | openFDA API, ClinicalTrials.gov API V2 | Real U.S. regulatory data |
 | Cache | Redis (optional) | Response and embedding caching |
 | Deployment | Docker + AWS ECS/Fargate | Cloud-native containerization |
@@ -217,16 +219,18 @@ pytest tests/ --cov=src --cov-report=term-missing
 
 ## Evaluation
 
-The platform includes a built-in evaluation framework with domain-specific metrics:
+**Status: no benchmark and no measured results.** `src/evaluation/evaluator.py` holds scoring code and a 27-case sample set (`SAMPLE_EVAL_DATASET`). That set is not referenced by any script or test, its reference answers (called expert-written in a code comment) carry no recorded source, label version or reviewer, and its header comment (28 cases, a "temporal" category) does not match its contents. The scores the code can produce are heuristic screens:
 
-| Metric | Description | Target |
+| Metric (as named in the code) | What the code actually computes | Target (aspirational, never measured) |
 |--------|-------------|--------|
-| Retrieval Precision | Correct drugs in retrieved docs | > 0.85 |
-| Faithfulness | Answer grounded in retrieved context | > 0.90 |
-| Citation Accuracy | All citations valid and traceable | > 0.95 |
-| Safety Completeness | Safety info included when relevant | > 0.95 |
-| Latency (p95) | End-to-end response time | < 5s |
-| Cost per Query | Average LLM cost | < $0.03 |
+| Retrieval precision | Share of cited drug names that match the expected drug names | > 0.85 |
+| Faithfulness | Word overlap between the answer and the first 200 characters of each cited chunk | > 0.90 |
+| Citation accuracy | Share of citations with a non-empty drug, section and label ID (does not check that the citation supports the claim) | > 0.95 |
+| Safety completeness | Number of six warning keywords found in the answer, for safety questions | > 0.95 |
+| Clinical accuracy | Share of required keywords present in the answer | not set |
+| Latency (p95), cost per query | Measured per query when the evaluator is run | < 5 s, < $0.03 |
+
+A protocol with a frozen held-out test set, a baseline system, human-verified scoring and a failure analysis has not been built.
 
 ---
 
@@ -281,30 +285,9 @@ clinical-doc-intel/
 
 ---
 
-## Course Module Coverage
-
-This project implements concepts from across the Full Stack Generative AI BootCamp:
-
-| Module | Topic | Implementation |
-|--------|-------|---------------|
-| 1 | Foundations of GenAI | Embeddings, vector space, similarity |
-| 3 | API for Accessing LLMs | Multi-provider router (OpenAI/Groq/Bedrock) |
-| 5 | LLM Hosting & API | FastAPI endpoint exposure |
-| 6 | Prompt Engineering | YAML prompt library, Jinja2 templates, CoT |
-| 7 | RAG Systems | Full pipeline: ingest → chunk → embed → retrieve → generate |
-| 8 | Advanced RAG | Query rewriting, re-ranking, caching, multimodal |
-| 10 | Evaluation | Faithfulness, relevance, safety metrics, cost tracking |
-| 11 | Guardrails | PHI detection, injection defense, output validation |
-| 12 | MCP | Standardized tool interfaces (extensible) |
-| 16 | E2E Deployment | Docker, FastAPI, cloud-native architecture |
-
----
-
 ## Related Projects
 
-- **[Medicare RAF Pipeline](https://github.com/erickyegon/medicare-raf-prototypes)** — Risk adjustment factor prediction for Medicare Advantage (ATT −$391/member)
-- **RWE Evidence Synthesis Agent** — Multi-agent system for systematic literature review automation (coming soon)
-- **HEDIS/STARS Quality Agent** — Automated care gap identification for managed care (coming soon)
+- **[Medicare RAF Pipeline](https://github.com/erickyegon/medicare-raf-prototypes)** — Risk adjustment factor prediction for Medicare Advantage (simulated claims)
 
 ---
 

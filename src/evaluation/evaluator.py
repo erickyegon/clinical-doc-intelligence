@@ -1,5 +1,9 @@
 """
 Evaluation Framework for Clinical Document Intelligence
+
+NOTE: the scores computed here are HEURISTIC SCREENS (word overlap, field-present and keyword checks). They are not clinical
+validation and have never been measured against a benchmark. "citation_accuracy" only checks that citation fields are non-empty;
+"faithfulness" is word overlap with the first 200 characters of each cited chunk.
 Implements RAG evaluation metrics and domain-specific clinical checks.
 
 Module 10: Evaluation Strategies
@@ -222,14 +226,14 @@ class RAGEvaluator:
             f"  Precision:         {d['retrieval']['precision']:.1%}",
             f"  Context Relevance: {d['retrieval']['context_relevance']:.1%}",
             "",
-            "GENERATION QUALITY",
-            f"  Faithfulness:      {d['generation']['faithfulness']:.1%}",
+            "GENERATION QUALITY (heuristic screens, not validation)",
+            f"  Faithfulness (word overlap):      {d['generation']['faithfulness']:.1%}",
             f"  Answer Relevance:  {d['generation']['answer_relevance']:.1%}",
-            f"  Citation Accuracy: {d['generation']['citation_accuracy']:.1%}",
+            f"  Citation fields present: {d['generation']['citation_accuracy']:.1%}",
             "",
             "DOMAIN-SPECIFIC",
             f"  Safety Completeness: {d['domain']['safety_completeness']:.1%}",
-            f"  Clinical Accuracy:   {d['domain']['clinical_accuracy']:.1%}",
+            f"  Required keywords found: {d['domain']['clinical_accuracy']:.1%}",
             "",
             "SYSTEM PERFORMANCE",
             f"  Avg Latency:  {d['system']['avg_latency_ms']:.0f} ms",
@@ -243,9 +247,10 @@ class RAGEvaluator:
 
 
 # === Pre-built Evaluation Dataset for FDA Drug Labels ===
-# 28 cases covering: SGLT2i, GLP-1 RA, Statins, ACE Inhibitors, PD-1, DPP-4
-# Categories: safety, general, comparison, temporal
-# Each case has expert-written expected answers and required keywords
+# 27 cases covering: SGLT2i, GLP-1 RA, Statins, ACE Inhibitors, PD-1, DPP-4
+# Categories present: safety (12), general (11), comparison (4); there are no temporal cases
+# Reference answers (originally described here as expert-written) have NO recorded source, label version or reviewer, and this set is not
+# referenced by any script or test. Treat it as an illustrative sample, not a benchmark.
 
 SAMPLE_EVAL_DATASET = [
     # ================================================================

@@ -301,7 +301,8 @@ class RAGChain:
 
     def _estimate_confidence(self, result: RetrievalResult) -> float:
         """
-        Estimate answer confidence based on retrieval quality.
+        Estimate a retrieval-quality score (mean of the top-3 retrieval scores plus a small section-diversity bonus).
+        This is NOT a calibrated probability that the answer is correct.
         Module 10: Evaluation Strategies
         """
         if not result.documents:
